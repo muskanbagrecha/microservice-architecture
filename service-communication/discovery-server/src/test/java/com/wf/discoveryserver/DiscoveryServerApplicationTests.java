@@ -1,4 +1,4 @@
-package io.javabrains.discoveryserver;
+package com.wf.discoveryserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

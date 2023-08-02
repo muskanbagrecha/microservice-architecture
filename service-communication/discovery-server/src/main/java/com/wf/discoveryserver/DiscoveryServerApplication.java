@@ -1,4 +1,4 @@
-package io.javabrains.discoveryserver;
+package com.wf.discoveryserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
