@@ -1,7 +1,5 @@
 package com.wf.moviecatalogservice.controller;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,12 +22,12 @@ public class MovieCatalogController {
 	RestTemplate restTemplate;
 	
 	@Autowired
-	WebClient.Builder webClientBuilder;
+	WebClient webClient;
 		
 	@RequestMapping("/{userId}")
 	public List<CatalogItem> getCatalog(@PathVariable int userId) {
 		
-		UserRating ratings = webClientBuilder.build().get().uri("http://ratings-data-service/api/v1/ratings/user/"+userId).retrieve().bodyToMono(UserRating.class).block();
+		UserRating ratings = webClient.get().uri("http://ratings-data-service/api/v1/ratings/user/"+userId).retrieve().bodyToMono(UserRating.class).block();
 		
 		
 		return ratings.getUserRatings().stream().map(rating -> {
@@ -38,7 +36,7 @@ public class MovieCatalogController {
 //			Movie movie = restTemplate.getForObject("http://localhost:8082/api/v1/movies/" + rating.getMovieId(), Movie.class);
 			
 //		Using Async WebClient builder
-			Movie movie = webClientBuilder.build().get().uri("http://movie-info-service/api/v1/movies/"+rating.getMovieId()).retrieve().bodyToMono(Movie.class).block();
+			Movie movie = webClient.get().uri("http://movie-info-service/api/v1/movies/"+rating.getMovieId()).retrieve().bodyToMono(Movie.class).block();
 			return new CatalogItem(movie.getDescription(), movie.getName(), rating.getRating());
 		}).collect(Collectors.toList());
 

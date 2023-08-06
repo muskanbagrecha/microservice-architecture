@@ -14,11 +14,6 @@ import com.wf.ratingsdataservice.model.UserRating;
 @RequestMapping("/api/v1/ratings/")
 public class RatingController {
 	
-	@RequestMapping("/{movieId}")
-	public Rating getMovieInfo(@PathVariable int movieId) {
-		return new Rating(1, 5);
-	}
-	
 	//take a user Id and return list of ratings given by the user. 
 	@RequestMapping("/user/{userId}")
 	public UserRating getRatingsForUser(@PathVariable String userId) {
