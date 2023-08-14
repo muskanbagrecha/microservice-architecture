@@ -1,5 +1,6 @@
 package com.wf.moviecatalogservice.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,8 @@ import com.wf.moviecatalogservice.model.CatalogItem;
 import com.wf.moviecatalogservice.model.Movie;
 import com.wf.moviecatalogservice.model.UserRating;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @RestController
 @RequestMapping("/api/v1/catalog")
 public class MovieCatalogController {
@@ -22,23 +25,33 @@ public class MovieCatalogController {
 	RestTemplate restTemplate;
 	
 	@Autowired
-	WebClient webClient;
+	WebClient.Builder webClient;
 		
 	@RequestMapping("/{userId}")
+	@CircuitBreaker(name = "catalogService", fallbackMethod = "getFallbackCatalog")
 	public List<CatalogItem> getCatalog(@PathVariable int userId) {
 		
-		UserRating ratings = webClient.get().uri("http://ratings-data-service/api/v1/ratings/user/"+userId).retrieve().bodyToMono(UserRating.class).block();
+//		UserRating userRating = webClient.build().get().uri("http://ratings-data-service/api/v1/ratings/user/"+userId).retrieve().bodyToMono(UserRating.class).block();
+		UserRating userRating = restTemplate.getForObject("http://ratings-data-service/api/v1/ratings/user/"+userId, UserRating.class);
+
 		
-		
-		return ratings.getUserRatings().stream().map(rating -> {
+		return userRating.getUserRatings().stream().map(rating -> {
 			
 //			Using synchronous rest template
 //			Movie movie = restTemplate.getForObject("http://localhost:8082/api/v1/movies/" + rating.getMovieId(), Movie.class);
+
 			
 //		Using Async WebClient builder
-			Movie movie = webClient.get().uri("http://movie-info-service/api/v1/movies/"+rating.getMovieId()).retrieve().bodyToMono(Movie.class).block();
-			return new CatalogItem(movie.getDescription(), movie.getName(), rating.getRating());
+			Movie movie = webClient.build().get().uri("http://movie-info-service/api/v1/movies/"+rating.getMovieId()).retrieve().bodyToMono(Movie.class).block();
+			return new CatalogItem(movie.getName(), movie.getDescription(), rating.getRating());
 		}).collect(Collectors.toList());
 
 	}
+	
+	public List<CatalogItem> getFallbackCatalog(@PathVariable int userId, Throwable t) {
+		return Arrays.asList(new CatalogItem("No movie", "No description", 0));
+	}
+	
+	
+
 }

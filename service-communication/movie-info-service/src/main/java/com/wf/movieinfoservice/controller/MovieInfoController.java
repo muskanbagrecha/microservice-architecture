@@ -22,10 +22,10 @@ public class MovieInfoController {
 	
 	@RequestMapping("/{movieId}")
 	public Movie getMovieInfo(@PathVariable int movieId) {
-		String req = "https://apis.themoviedb.org/3/movie/"+ movieId + "?api_key=" + apiConfiguration.getApiKey();
-		System.out.println(req);
+		String req = "https://api.themoviedb.org/3/movie/"+ movieId + "?api_key=" + apiConfiguration.getApiKey();
+//		System.out.println(req);
 		MovieSummary movieSummary = restTemplate.getForObject(req, MovieSummary.class);
-		System.out.println(movieSummary);
+//		System.out.println(movieSummary);
 		return new Movie(movieSummary.getId(), movieSummary.getTitle(), movieSummary.getOverview());
 	}
 	
