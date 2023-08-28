@@ -18,8 +18,6 @@ import com.wf.moviecatalogservice.service.UserRatingService;
 @RequestMapping("/api/v1/catalog")
 public class MovieCatalogController {
 	
-	@Autowired
-	WebClient.Builder webClient;
 	
 	@Autowired
 	MovieInfoService movieInfoService;
